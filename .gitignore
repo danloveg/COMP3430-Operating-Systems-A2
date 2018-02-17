@@ -1,3 +1,6 @@
 # Ignored objects folders
 object/
 
+#Ignore Q2 executable
+Q2/question2
+
