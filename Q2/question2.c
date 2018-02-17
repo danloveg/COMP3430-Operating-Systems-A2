@@ -24,7 +24,9 @@ int main(int argc, char *argv[]) {
     pthread_create(&threads[0], NULL, dummyThread, NULL);
     pthread_create(&threads[1], NULL, dummyThread, NULL);
 
-    // Demonstrate that there is only one LWP for the process
+    // Demonstrate that there is only one kernel level thread for the process.
+    // We do this by effectively running:
+    //         ps axo pid,nlwp | grep -E 'PID NLWP|^ rootPID' > q2output.txt
     rootPID = getpid();
     pipe(fd);
     pid = fork();
@@ -36,9 +38,8 @@ int main(int argc, char *argv[]) {
         assert(pid != -1);
 
         if (pid == 0) {
-            // Close read part of pipe
+            // Send stdout to fd[WRITE]
             close(fd[READ]);
-            // Close stdout, duplicate with write part of pipe
             dup2(fd[WRITE], STDOUT_FILENO);
             close(fd[WRITE]);
 
@@ -50,19 +51,19 @@ int main(int argc, char *argv[]) {
             int fileDescriptor = open(FILENAME, O_WRONLY|O_CREAT, 0666);
 
             if (fileDescriptor != -1) {
-                // Close write part of pipe
+                // Get stdin from fd[READ], send stdout to a file
                 close(fd[WRITE]);
-                // Close stdin, replace with read part of pipe
                 dup2(fd[READ], STDIN_FILENO);
                 close(fd[READ]);
-                // Set stdout to the file we opened
                 dup2(fileDescriptor, STDOUT_FILENO);
+
+                // Print a title for the file (stdout is being piped to file)
+                printf("Process Stats\n");
+
                 // Create argument array for grep
                 char buf[20]; char *pattern = &buf[0];
                 sprintf(pattern, "PID NLWP|^ %d", rootPID);
-                char *args[] = {"/bin/grep", "-E", &pattern[0], 0};
-                // Print a title for the file
-                printf("Process Stats\n");
+                char *args[] = {"/bin/grep", "-E", pattern, 0};
 
                 // Execute grep to find our process
                 returnStatus = execv("/bin/grep", args);
@@ -73,6 +74,7 @@ int main(int argc, char *argv[]) {
             }
         }
     } else {
+        // Wait on processes to complete
         waitpid(pid, &returnStatus, 0);
     }
 
