@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
 
                 // Create argument array for grep
                 char buf[20]; char *pattern = &buf[0];
-                sprintf(pattern, "PID NLWP|^ %d", rootPID);
+                sprintf(pattern, "PID NLWP|^ *%d", rootPID);
                 char *args[] = {"/bin/grep", "-E", pattern, 0};
 
                 // Execute grep to find our process
