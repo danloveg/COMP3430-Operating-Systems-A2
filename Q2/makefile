@@ -18,5 +18,3 @@ $(OBJDIR):
 
 clean:
 	rm -rf $(PROG) $(OBJECTS)
-	rm q2output.txt
-
