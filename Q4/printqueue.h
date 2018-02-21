@@ -14,7 +14,7 @@
 void createQueue(int len);
 void destroyQueue();
 bool enter(PrintRequest * req);
-bool exit(PrintRequest * req);
+bool leave(PrintRequest * req);
 bool full();
 bool empty();
 

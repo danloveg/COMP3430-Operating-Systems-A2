@@ -9,6 +9,7 @@
 #include "printqueue.h"
 #include <assert.h>
 #include <stddef.h>
+#include <stdlib.h>
 
 typedef struct __PRINT_JOB_QUEUE {
     int currLen;
@@ -46,7 +47,7 @@ bool enter(PrintRequest * req) {
     return entered;
 }
 
-bool exit(PrintRequest * req) {
+bool leave(PrintRequest * req) {
     assert(queue != NULL && "Queue must be initialized");
     bool reqReturned = false;
 
