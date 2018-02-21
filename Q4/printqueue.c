@@ -22,7 +22,8 @@ PrintJobQueue * queue = NULL;
 
 void createQueue(int len) {
     assert(len > 0 && "Queue length must be greater than zero");
-    queue -> queueArray = malloc(sizeof(PrintRequest) * 4);
+    queue = (PrintJobQueue *) calloc(1, sizeof(PrintJobQueue));
+    queue -> queueArray = (PrintRequest *) calloc(len, sizeof(PrintRequest));
     assert(queue != NULL && "Memory allocation failed in queue creation");
     queue -> maxLen = len;
     queue -> currLen = 0;
@@ -30,8 +31,11 @@ void createQueue(int len) {
 }
 
 void destroyQueue() {
-    free (queue -> queueArray);
-    queue = NULL;
+    if (queue != NULL) {
+        free (queue -> queueArray);
+        free (queue);
+        queue = NULL;
+    }
 }
 
 bool enter(PrintRequest * req) {

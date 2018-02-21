@@ -25,6 +25,9 @@ int main(int argc, char *argv[]) {
     getArgs(argc, argv, &NumPrintClients, &NumPrinters);
 
     printf("Number of clients: %d\nNumber of printers: %d\n", NumPrintClients, NumPrinters);
+
+    createQueue(QUEUE_LEN);
+    destroyQueue();
 }
 
 /**
