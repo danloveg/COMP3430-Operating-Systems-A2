@@ -8,6 +8,8 @@
 #ifndef PRINT_MANAGER_H
 #define PRINT_MANAGER_H
 
+#define QUEUE_LEN 4
+
 typedef struct __PRINT_REQUEST {
     long clientID;
     char *fileName;

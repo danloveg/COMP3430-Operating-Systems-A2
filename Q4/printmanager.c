@@ -14,6 +14,7 @@
 #include <pthread.h>
 #include <unistd.h>
 #include "printmanager.h"
+#include "printqueue.h"
 
 
 void getArgs(int argc, char *argv[], int *numprintclients, int *numprinters);
@@ -37,7 +38,7 @@ int main(int argc, char *argv[]) {
 void getArgs(int argc, char *argv[], int *numprintclients, int *numprinters) {
     char *eptr;
 
-    assert(argc != 2 && "Only two arguments are allowed");
+    assert(argc == 3 && "Only two arguments are allowed");
     *numprintclients  = strtol(argv[1], &eptr, 10);
     assert(*numprintclients != 0 && eptr != argv[1] && "Error converting first arg to int");
     *numprinters = strtol(argv[2], &eptr, 10);
