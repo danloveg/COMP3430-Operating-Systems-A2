@@ -11,7 +11,8 @@
 #include <stdbool.h>
 #include "printmanager.h"
 
-void createQueue(int len, PrintRequest **queue);
+void createQueue(int len);
+void destroyQueue();
 bool enter(PrintRequest * req);
 bool exit(PrintRequest * req);
 bool full();
