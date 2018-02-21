@@ -1,6 +1,9 @@
 # Ignored objects folders
 object/
 
-#Ignore Q2 executable
+# Ignore Q2 executable
 Q2/question2
+
+# Ignore Q4 executable
+Q4/printmanager
 
