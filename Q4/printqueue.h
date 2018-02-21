@@ -5,13 +5,16 @@
 // Version: Feb 21/2018
 // *****************************************************************************
 
-#ifndef PRINT_MANAGER_H
-#define PRINT_MANAGER_H
+#ifndef PRINT_QUEUE_H
+#define PRINT_QUEUE_H
 
-typedef struct __PRINT_REQUEST {
-    long clientID;
-    char *fileName;
-    int fileSize;
-} PrintRequest;
+#include <stdbool.h>
+#include "printmanager.h"
+
+void createQueue(int len, PrintRequest **queue);
+bool enter(PrintRequest * req);
+bool exit(PrintRequest * req);
+bool full();
+bool empty();
 
 #endif
