@@ -42,7 +42,7 @@ bool enter(PrintRequest * req) {
     assert(queue != NULL && "Queue must be initialized");
     bool entered = false;
 
-    if (full() == false) {
+    if (queuefull() == false) {
         queue -> queueArray[(queue -> currIndex + queue -> currLen) % queue -> maxLen] = *req;
         queue -> currLen++;
         entered = true;
@@ -55,7 +55,7 @@ bool leave(PrintRequest **req) {
     assert(queue != NULL && "Queue must be initialized");
     bool reqReturned = false;
 
-    if (empty() == false) {
+    if (queueempty() == false) {
         (*req) = &(queue -> queueArray[queue -> currIndex]);
         queue -> currIndex = (queue -> currIndex + 1) % queue -> maxLen;
         queue -> currLen--;
@@ -64,7 +64,7 @@ bool leave(PrintRequest **req) {
     return reqReturned;
 }
 
-bool full() {
+bool queuefull() {
     assert(queue != NULL && "Queue must be initialized");
     bool full = false;
 
@@ -77,7 +77,7 @@ bool full() {
     return full;
 }
 
-bool empty() {
+bool queueempty() {
     assert(queue != NULL && "Queue must be initialized");
     bool empty = false;
 

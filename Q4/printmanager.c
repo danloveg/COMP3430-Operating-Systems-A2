@@ -17,6 +17,8 @@
 #include "printmanager.h"
 #include "printqueue.h"
 
+static pthread_cond_t notFull, notEmpty = PTHREAD_COND_INITIALIZER;
+static pthread_mutex_t bufferLock = PTHREAD_MUTEX_INITIALIZER;
 
 int main(int argc, char *argv[]) {
     int NumPrintClients, NumPrinters, i = 0;
@@ -38,7 +40,6 @@ int main(int argc, char *argv[]) {
         pthread_create(&serverThreads[i], NULL, PrintServer, NULL);
     }
 
-    destroyQueue();
     pthread_exit(NULL);
 }
 
@@ -86,11 +87,25 @@ void *PrintClient(void *args) {
 
 
 void insertIntoBoundBuffer(PrintRequest * req) {
-
+    pthread_mutex_lock(&bufferLock);
+    // If the queue is full, wait until notFull
+    while (queuefull() == true)
+        pthread_cond_wait(&notFull, &bufferLock);
+    // Insert an item and signal notEmpty
+    enter(req);
+    pthread_cond_signal(&notEmpty);
+    pthread_mutex_unlock(&bufferLock);
 }
 
 void removeFromBoundedBuffer(PrintRequest * req) {
-
+    pthread_mutex_lock(&bufferLock);
+    // If the queue is empty, wait until notEmpty
+    while (queueempty() == true)
+        pthread_cond_wait(&notEmpty, &bufferLock);
+    // Remove an item and signal notFull
+    leave(&req);
+    pthread_cond_signal(&notFull);
+    pthread_mutex_unlock(&bufferLock);
 }
 
 
