@@ -33,7 +33,8 @@ int main(int argc, char *argv[]) {
     example -> clientID = 1;
     example -> fileName = "file_1";
     example -> fileSize = 20;
-    enter(example);
+    int i;
+    for (i = 0; i < 10; i++) { enter(example); }
     PrintRequest * exampleDuplicate = NULL;
     leave(&exampleDuplicate);
     assert(example -> clientID == exampleDuplicate -> clientID && "Entered job doesn't match exited");
