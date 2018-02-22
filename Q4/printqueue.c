@@ -51,12 +51,12 @@ bool enter(PrintRequest * req) {
     return entered;
 }
 
-bool leave(PrintRequest * req) {
+bool leave(PrintRequest **req) {
     assert(queue != NULL && "Queue must be initialized");
     bool reqReturned = false;
 
     if (empty() == false) {
-        req = &(queue -> queueArray[queue -> currIndex]);
+        (*req) = &(queue -> queueArray[queue -> currIndex]);
         queue -> currIndex = (queue -> currIndex + 1) % queue -> maxLen;
         queue -> currLen--;
     }

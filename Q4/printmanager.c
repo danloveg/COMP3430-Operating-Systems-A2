@@ -27,6 +27,18 @@ int main(int argc, char *argv[]) {
     printf("Number of clients: %d\nNumber of printers: %d\n", NumPrintClients, NumPrinters);
 
     createQueue(QUEUE_LEN);
+
+    // Test enter and leave
+    PrintRequest * example = malloc(sizeof(PrintRequest));
+    example -> clientID = 1;
+    example -> fileName = "file_1";
+    example -> fileSize = 20;
+    enter(example);
+    PrintRequest * exampleDuplicate = NULL;
+    leave(&exampleDuplicate);
+    assert(example -> clientID == exampleDuplicate -> clientID && "Entered job doesn't match exited");
+    free (example);
+
     destroyQueue();
 }
 
