@@ -2,7 +2,7 @@
 // printmanager.h
 //
 // Author: Daniel Lovegrove
-// Version: Feb 21/2018
+// Version: Feb 22/2018
 // *****************************************************************************
 
 #ifndef PRINT_MANAGER_H
@@ -15,5 +15,11 @@ typedef struct __PRINT_REQUEST {
     char *fileName;
     int fileSize;
 } PrintRequest;
+
+void *PrintServer(void *args);
+void *PrintClient(void *args);
+void insertIntoBoundBuffer(PrintRequest * req);
+void removeFromBoundedBuffer(PrintRequest * req);
+void getArgs(int argc, char *argv[], int *numprintclients, int *numprinters);
 
 #endif
