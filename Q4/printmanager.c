@@ -17,8 +17,10 @@
 #include "printmanager.h"
 #include "printqueue.h"
 
+
 static pthread_cond_t notFull, notEmpty = PTHREAD_COND_INITIALIZER;
 static pthread_mutex_t bufferLock = PTHREAD_MUTEX_INITIALIZER;
+
 
 int main(int argc, char *argv[]) {
     int NumPrintClients, NumPrinters, i = 0;
@@ -45,16 +47,59 @@ int main(int argc, char *argv[]) {
 
 
 /**
- * Print server thread.
+ * Print server thread. Removes print jobs from the queue constantly.
+ *
+ * @param void *args: Not used.
  */
 void *PrintServer(void *args) {
-    // long tid = pthread_self();
-    return NULL;
+    long tid = pthread_self();
+    int timeToPrint;
+    int bufferSize = 32;
+    time_t currentTime;
+    struct tm * tmInfo;
+    char time_buf[bufferSize];
+    char * timeString = &time_buf[0];
+    PrintRequest * currentJob = NULL;
+
+    while (1) {
+        // Get a job and assure it's valid
+        removeFromBoundedBuffer(&currentJob);
+        assert(currentJob != NULL && "Job cannot be NULL");
+        assert(currentJob -> fileName != NULL && "Filename cannot be NULL");
+
+        time(&currentTime);
+        tmInfo = localtime(&currentTime);
+        strftime(timeString, bufferSize, TIME_FORMAT, tmInfo);
+
+        printf("Printer %ld STARTED print job:\n", tid);
+        printf("\tTime:      %s\n", timeString);
+        printf("\tClient ID: %ld\n", currentJob -> clientID);
+        printf("\tFilename:  %s\n", currentJob -> fileName);
+        printf("\tFile size: %d\n", currentJob -> fileSize);
+
+        // Sleep to mimic printing
+        timeToPrint = (currentJob -> fileSize) / BYTES_PER_SEC;
+        sleep(timeToPrint);
+
+        time(&currentTime);
+        tmInfo = localtime(&currentTime);
+        strftime(timeString, bufferSize, TIME_FORMAT, tmInfo);
+
+        printf("Printer %ld FINISHED print job:\n", tid);
+        printf("\tTime:      %s\n", timeString);
+        printf("\tClient ID: %ld\n", currentJob -> clientID);
+        printf("\tFilename:  %s\n", currentJob -> fileName);
+        printf("\tFile size: %d\n", currentJob -> fileSize);
+    }
+
+    pthread_exit(NULL);
 }
 
 
 /**
- * Print client thread.
+ * Print client thread. Creates 6 print jobs
+ *
+ * @param void *args: Not used.
  */
 void *PrintClient(void *args) {
     int i, filesize;
@@ -63,47 +108,63 @@ void *PrintClient(void *args) {
     char file_buf[32];
     char *filename = &file_buf[0];
     char *filenameDynamic = NULL;
-    PrintRequest * request;
+    PrintRequest request;
 
     for (i = 0; i < 6; i++) {
         // Filesize between 500 and 40000
         filesize = (rand_r(&randseed) % 39501) + 500;
+
+        // Put the filename in the buffer, then duplicate it to a new string
         sprintf(filename, "File-%ld-%d", tid, i);
         filenameDynamic = strdup(filename);
+        assert(filenameDynamic != NULL && "memory allocation failed in print client");
 
-        request = calloc(1, sizeof(PrintRequest));
-        request -> clientID = tid;
-        request -> fileName = filenameDynamic;
-        request -> fileSize = filesize;
+        // Create the request job
+        request.clientID = tid;
+        request.fileName = filenameDynamic;
+        request.fileSize = filesize;
 
-        insertIntoBoundBuffer(request);
+        insertIntoBoundedBuffer(&request);
 
         // Sleep for 0 to 3 seconds
         sleep(rand_r(&randseed) % 4);
     }
 
-    return NULL;
+    pthread_exit(NULL);
 }
 
 
-void insertIntoBoundBuffer(PrintRequest * req) {
+/**
+ * Insert a print job into the queue safely.
+ * 
+ * @param PrintRequest * req: The request to add. 
+ */
+void insertIntoBoundedBuffer(PrintRequest * req) {
     pthread_mutex_lock(&bufferLock);
     // If the queue is full, wait until notFull
     while (queuefull() == true)
         pthread_cond_wait(&notFull, &bufferLock);
     // Insert an item and signal notEmpty
-    enter(req);
+    bool entered = enter(req);
+    assert(entered == true && "Entry into queue failed");
     pthread_cond_signal(&notEmpty);
     pthread_mutex_unlock(&bufferLock);
 }
 
-void removeFromBoundedBuffer(PrintRequest * req) {
+
+/**
+ * Remove a print job from the queue safely.
+ * 
+ * @param PrintRequest ** req: Gets assigned to the print job received.
+ */
+void removeFromBoundedBuffer(PrintRequest ** req) {
     pthread_mutex_lock(&bufferLock);
     // If the queue is empty, wait until notEmpty
     while (queueempty() == true)
         pthread_cond_wait(&notEmpty, &bufferLock);
     // Remove an item and signal notFull
-    leave(&req);
+    bool left = leave(req);
+    assert(left == true && "Removal from queue failed");
     pthread_cond_signal(&notFull);
     pthread_mutex_unlock(&bufferLock);
 }

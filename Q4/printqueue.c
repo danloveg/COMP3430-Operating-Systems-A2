@@ -10,6 +10,7 @@
 #include <assert.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct __PRINT_JOB_QUEUE {
     int currLen;
@@ -59,6 +60,7 @@ bool leave(PrintRequest **req) {
         (*req) = &(queue -> queueArray[queue -> currIndex]);
         queue -> currIndex = (queue -> currIndex + 1) % queue -> maxLen;
         queue -> currLen--;
+        reqReturned = true;
     }
 
     return reqReturned;
