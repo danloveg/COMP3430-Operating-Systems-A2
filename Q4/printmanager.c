@@ -54,10 +54,9 @@ int main(int argc, char *argv[]) {
 void *PrintServer(void *args) {
     long tid = pthread_self();
     int timeToPrint;
-    int bufferSize = 32;
     time_t currentTime;
     struct tm * tmInfo;
-    char time_buf[bufferSize];
+    char time_buf[BUF_SIZE];
     char * timeString = &time_buf[0];
     PrintRequest * currentJob = NULL;
 
@@ -69,7 +68,7 @@ void *PrintServer(void *args) {
 
         time(&currentTime);
         tmInfo = localtime(&currentTime);
-        strftime(timeString, bufferSize, TIME_FORMAT, tmInfo);
+        strftime(timeString, BUF_SIZE, TIME_FORMAT, tmInfo);
 
         printf("Printer %ld STARTED print job:\n", tid);
         printf("\tTime:      %s\n", timeString);
@@ -83,7 +82,7 @@ void *PrintServer(void *args) {
 
         time(&currentTime);
         tmInfo = localtime(&currentTime);
-        strftime(timeString, bufferSize, TIME_FORMAT, tmInfo);
+        strftime(timeString, BUF_SIZE, TIME_FORMAT, tmInfo);
 
         printf("Printer %ld FINISHED print job:\n", tid);
         printf("\tTime:      %s\n", timeString);
@@ -105,14 +104,14 @@ void *PrintClient(void *args) {
     int i, filesize;
     long tid = pthread_self();
     unsigned int randseed = (unsigned int) tid;
-    char file_buf[32];
+    char file_buf[BUF_SIZE];
     char *filename = &file_buf[0];
     char *filenameDynamic = NULL;
     PrintRequest request;
 
-    for (i = 0; i < 6; i++) {
-        // Filesize between 500 and 40000
-        filesize = (rand_r(&randseed) % 39501) + 500;
+    for (i = 0; i < NUM_ITERATIONS; i++) {
+        // Filesize between MIN and MAX
+        filesize = (rand_r(&randseed) % (FILE_SIZE_MAX + 1 - FILE_SIZE_MIN)) + FILE_SIZE_MIN;
 
         // Put the filename in the buffer, then duplicate it to a new string
         sprintf(filename, "File-%ld-%d", tid, i);
@@ -126,8 +125,8 @@ void *PrintClient(void *args) {
 
         insertIntoBoundedBuffer(&request);
 
-        // Sleep for 0 to 3 seconds
-        sleep(rand_r(&randseed) % 4);
+        // Sleep for up to MAX seconds
+        sleep(rand_r(&randseed) % (SLEEP_TIME_MAX + 1));
     }
 
     pthread_exit(NULL);
