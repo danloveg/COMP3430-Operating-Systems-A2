@@ -1,21 +1,24 @@
-# COMP 3430 Winter 2018 Assignment 2 - Synchronization and Threads
+# COMP 3430 Winter 2018 Assignment 2 - Synchronization and Threads in C
 
+### Overview
+Assignment 2 involves synchronization using semaphores, locks, and condition variables. Two of the questions (Q2 & Q4) are written in code (all in C). Question 2 is a simple demonstration that pthread_create() in C does not create kernel level threads, but creates user level threads. Question 4 is a simulation of multiple clients adding print jobs to a finite print queue with printers "printing" out the files. The issue question 4 poses is that of how to safely use a bounded buffer. I use a "monitor" to guard the entering and exiting of the queue.
 
-Synchronization and Threads in C.
-
+### Details
 Two of the assignment questions are code, the rest are answered in the assignment PDF. All of the code has only been tested on Linux (Scientific and Ubuntu) and cannot be guaranteed to work on Mac or Windows.
 
-To run the Q2 code:
+---
 
-1. Change directory to Q2:  `cd Q2`
+### Running the Code
+
+#### Question 2
+1. From a terminal, change directory to Q2:  `cd Q2`
 2. Make the executable:  `make`
 3. Run the executable:  `./question2`
 
-Q2 creates output to a file called q2output.txt in the Q2 folder. This text file demonstrates that there are no kernel level threads created in the process. See the assignment PDF for more info.
+Q2 creates output to a file called q2output.txt in the Q2 folder. This text file demonstrates that there are no kernel level threads created in the process. See the assignment PDF for more info. The program will run until you Ctrl-C it.
 
-To run the Q4 code:
-
-1. Change directory to Q4:  `cd Q4`
+#### Question 4
+1. From a terminal, change directory to Q4:  `cd Q4`
 2. Make the executable:  `make`
 3. Run the executable with two integer arguments:  `./printmanager 5 2`
 
