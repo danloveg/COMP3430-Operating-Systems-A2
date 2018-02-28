@@ -4,7 +4,7 @@
 Assignment 2 involves synchronization using semaphores, locks, and condition variables. Two of the questions (Q2 & Q4) are written in code (all in C). Question 2 is a simple demonstration that pthread_create() in C does not create kernel level threads, but creates user level threads. Question 4 is a simulation of multiple clients adding print jobs to a finite print queue with printers "printing" out the files. The issue question 4 poses is that of how to safely use a bounded buffer. I use a "monitor" to guard the entering and exiting of the queue.
 
 ## Details
-Two of the assignment questions are code, the rest are answered in the assignment PDF. All of the code has only been tested on Linux (Scientific and Ubuntu) and cannot be guaranteed to work on Mac or Windows.
+All of the code has only been tested on Linux (Scientific and Ubuntu) and cannot be guaranteed to work on Mac or Windows. The assignment questions that are not in code are in the PDF file at the root of this repository.
 
 ## Running the Code
 
